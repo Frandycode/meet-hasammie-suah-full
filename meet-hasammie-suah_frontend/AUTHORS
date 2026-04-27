@@ -1,0 +1,28 @@
+# AUTHORS
+# Meet HaSammie Suah — Personal Athlete Website
+# ==============================================
+
+## Lead Developer
+
+Name:      Frandy Slueue
+Title:     Software Engineering · Security · IT Operations
+Portfolio: https://frandycode.dev
+GitHub:    https://github.com/frandycode
+Email:     frandyslueue@gmail.com
+Location:  Tulsa, OK & Dallas, TX (Central Time)
+
+## Athlete
+
+Name:     HaSammie Suah
+Sport:    Track & Field — Sprints
+School:   Union High School, Tulsa, Oklahoma
+Rank:     Top 5 Track Runner — State of Oklahoma
+Grade:    11th Grade
+Born:     August 5, 2009
+
+## Project
+
+Site:     Meet HaSammie Suah
+Version:  3.0.0
+Stack:    React · TypeScript · Vite · Tailwind · Apollo GraphQL
+          Node.js · Prisma · PostgreSQL · Docker · Nginx

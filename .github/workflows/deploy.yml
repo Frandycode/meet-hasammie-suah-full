@@ -1,0 +1,55 @@
+# ── CD — Deploy to production (Hostinger VPS) ────────────────────────────────
+#
+# Runs only when CI passes on a push to main.
+# SSHs into your server, pulls the latest code, and restarts Docker Compose.
+#
+# Required GitHub Secrets (Repo → Settings → Secrets → Actions):
+#   SERVER_HOST      — your server IP or domain, e.g. 123.45.67.89
+#   SERVER_USER      — SSH username, e.g. root or ubuntu
+#   SERVER_SSH_KEY   — contents of your private SSH key (~/.ssh/id_rsa)
+#   SERVER_APP_PATH  — path to the project on the server, e.g. /var/www/sammie
+
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to server
+    runs-on: ubuntu-latest
+    # Only deploy if CI passed — never deploy a broken build
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host:     ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key:      ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e   # stop if any command fails
+
+            cd ${{ secrets.SERVER_APP_PATH }}
+
+            echo "⬇️  Pulling latest code..."
+            git pull origin main
+
+            echo "🐳  Rebuilding and restarting containers..."
+            docker compose pull db   # pull latest postgres if updated
+            docker compose up --build -d
+
+            echo "🗄️  Running any pending DB migrations..."
+            docker compose exec -T api ./node_modules/.bin/prisma migrate deploy
+
+            echo "✅  Deploy complete"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Deploy failed. Check the Actions log for details."
+          # TODO: add Slack / email notification here if desired

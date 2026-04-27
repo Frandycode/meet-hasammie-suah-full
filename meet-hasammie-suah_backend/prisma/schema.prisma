@@ -1,0 +1,319 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Admin authentication ─────────────────────────────────────────────────────
+model Admin {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ── Site content ─────────────────────────────────────────────────────────────
+model SiteHero {
+  id       String @id @default(cuid())
+  tagline  String @default("Born to Run. Built to Win.")
+  subtitle String @default("Top 5 Track Runner in the State of Oklahoma")
+  quote    String @default("\"Every step is a statement. Every finish line, a promise.\"")
+}
+
+model SiteBio {
+  id        String @id @default(cuid())
+  intro     String @db.Text
+  story     String @db.Text
+  coachNote String @db.Text
+  coachName String
+}
+
+model SiteSocial {
+  id        String  @id @default(cuid())
+  instagram String?
+  twitter   String?
+  tiktok    String?
+}
+
+model SiteContact {
+  id       String @id @default(cuid())
+  email    String
+  forMedia String
+}
+
+model SiteDonate {
+  id       String  @id @default(cuid())
+  cashapp  String?
+  venmo    String?
+  zelle    String?
+  gofundme String?
+  message  String  @db.Text
+}
+
+// ── Stats ────────────────────────────────────────────────────────────────────
+model Stat {
+  id        String   @id @default(cuid())
+  label     String
+  value     String
+  unit      String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ── Achievements ─────────────────────────────────────────────────────────────
+model Achievement {
+  id          String    @id @default(cuid())
+  title       String
+  description String    @db.Text
+  date        String
+  medal       MedalType @default(BRONZE)
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum MedalType {
+  GOLD
+  SILVER
+  BRONZE
+}
+
+// ── Gallery ──────────────────────────────────────────────────────────────────
+model GalleryPhoto {
+  id          String        @id @default(cuid())
+  caption     String
+  category    PhotoCategory @default(PERSONAL)
+  date        String
+  storageType StorageType   @default(LOCAL)
+  filePath    String?
+  fileSize    Int?
+  mimeType    String?
+  url         String?
+  width       Int?
+  height      Int?
+  order       Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+enum PhotoCategory {
+  RACE
+  TRAINING
+  TEAM
+  AWARDS
+  PERSONAL
+}
+
+enum StorageType {
+  LOCAL
+  CLOUDINARY
+  URL
+}
+
+// ── Events ───────────────────────────────────────────────────────────────────
+model Event {
+  id        String    @id @default(cuid())
+  title     String
+  date      DateTime
+  location  String
+  type      EventType @default(MEET)
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+enum EventType {
+  MEET
+  CHAMPIONSHIP
+  TRAINING
+  OTHER
+}
+
+// ── Profile & Hero images ────────────────────────────────────────────────────
+model SiteImage {
+  id          String      @id @default(cuid())
+  type        ImageType   @unique
+  storageType StorageType @default(LOCAL)
+  filePath    String?
+  url         String?
+  updatedAt   DateTime    @updatedAt
+}
+
+enum ImageType {
+  PROFILE
+  HERO_BG
+}
+
+// ── Analytics ────────────────────────────────────────────────────────────────
+model PageView {
+  id          String   @id @default(cuid())
+  page        String
+  referrer    String?
+  userAgent   String?
+  sessionId   String
+  durationSec Int?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([page])
+  @@index([sessionId])
+}
+
+// ── Press kit ─────────────────────────────────────────────────────────────────
+model PressKitAsset {
+  id          String         @id @default(cuid())
+  label       String
+  type        PressAssetType @default(PHOTO)
+  storageType StorageType    @default(LOCAL)
+  filePath    String?
+  url         String?
+  fileSize    Int?
+  mimeType    String?
+  order       Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([type])
+}
+
+model PressKitMeta {
+  id           String   @id @default(cuid())
+  pressBio     String   @db.Text
+  contactName  String   @default("HaSammie Suah")
+  contactEmail String   @default("")
+  updatedAt    DateTime @updatedAt
+}
+
+enum PressAssetType {
+  PHOTO
+  DOCUMENT
+}
+
+// ── Sponsors ──────────────────────────────────────────────────────────────────
+model Sponsor {
+  id          String      @id @default(cuid())
+  name        String
+  tier        SponsorTier @default(COMMUNITY)
+  logoUrl     String?
+  website     String?
+  description String?     @db.Text
+  order       Int         @default(0)
+  active      Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([tier])
+  @@index([active])
+}
+
+enum SponsorTier {
+  GOLD
+  SILVER
+  COMMUNITY
+}
+
+// ── Video highlights ──────────────────────────────────────────────────────────
+model VideoHighlight {
+  id        String        @id @default(cuid())
+  title     String
+  url       String
+  embedUrl  String
+  thumbnail String?
+  category  VideoCategory @default(RACE)
+  featured  Boolean       @default(false)
+  order     Int           @default(0)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([category])
+  @@index([featured])
+}
+
+enum VideoCategory {
+  RACE
+  TRAINING
+  INTERVIEW
+  OTHER
+}
+
+// ── Blog / News ───────────────────────────────────────────────────────────────
+model BlogPost {
+  id          String       @id @default(cuid())
+  title       String
+  slug        String       @unique
+  excerpt     String       @db.Text
+  content     String       @db.Text
+  coverUrl    String?
+  category    BlogCategory @default(NEWS)
+  tags        String[]     @default([])
+  published   Boolean      @default(false)
+  publishedAt DateTime?
+  featured    Boolean      @default(false)
+  order       Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([published])
+  @@index([category])
+  @@index([slug])
+  @@index([featured])
+}
+
+enum BlogCategory {
+  NEWS
+  TRAINING
+  PERSONAL
+  MEDIA
+}
+
+// ── Social feed ───────────────────────────────────────────────────────────────
+model SocialPost {
+  id        String         @id @default(cuid())
+  platform  SocialPlatform @default(INSTAGRAM)
+  imageUrl  String
+  caption   String         @db.Text
+  postUrl   String
+  likes     Int?
+  published Boolean        @default(true)
+  featured  Boolean        @default(false)
+  order     Int            @default(0)
+  postedAt  DateTime       @default(now())
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@index([published])
+  @@index([platform])
+  @@index([featured])
+}
+
+enum SocialPlatform {
+  INSTAGRAM
+  TIKTOK
+  TWITTER
+  OTHER
+}
+
+// ── Supporter wall ────────────────────────────────────────────────────────────
+model SupporterMessage {
+  id        String   @id @default(cuid())
+  name      String
+  location  String?
+  amount    String?
+  message   String   @db.Text
+  platform  String?
+  approved  Boolean  @default(false)
+  featured  Boolean  @default(false)
+  pinned    Boolean  @default(false)
+  emoji     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([approved])
+  @@index([featured])
+  @@index([pinned])
+}

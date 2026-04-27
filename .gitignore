@@ -1,0 +1,36 @@
+# ============================================================
+# MeetHaSammieSuah — Root .gitignore
+# ============================================================
+
+# Environment variables (NEVER commit secrets)
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor & IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker
+docker-compose.override.yml
+
+# Database backups — stored on server, never in git
+backups/
+
+# Make backup script executable but don't track changes to it
+# (chmod +x scripts/backup.sh on the server)

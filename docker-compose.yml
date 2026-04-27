@@ -1,0 +1,88 @@
+version: '3.9'
+
+services:
+
+  # ── PostgreSQL Database ──────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: sammie_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER:-sammie}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sammie_secret}
+      POSTGRES_DB:       ${POSTGRES_DB:-sammie_site}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"   # remove this line in production
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sammie}"]
+      interval: 10s
+      timeout:  5s
+      retries:  5
+
+  # ── GraphQL API ───────────────────────────────────────────────────────────────
+  api:
+    build:
+      context:    ./meet-hasammie-suah_backend
+      dockerfile: Dockerfile
+    container_name: sammie_api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL:   postgresql://${POSTGRES_USER:-sammie}:${POSTGRES_PASSWORD:-sammie_secret}@db:5432/${POSTGRES_DB:-sammie_site}
+      JWT_SECRET:     ${JWT_SECRET:-change-this-in-production}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-sammie2009}
+      PORT:           4000
+      NODE_ENV:       ${NODE_ENV:-production}
+      BASE_URL:       ${API_BASE_URL:-http://localhost:4000}
+      FRONTEND_URL:   ${FRONTEND_URL:-http://localhost:3000}
+      UPLOADS_DIR:    /app/uploads
+      # Optional Cloudinary — leave blank to use local storage only
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
+      CLOUDINARY_API_KEY:    ${CLOUDINARY_API_KEY:-}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
+    volumes:
+      - uploads_data:/app/uploads   # persistent image storage
+    ports:
+      - "4000:4000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4000/health || exit 1"]
+      interval: 30s
+      timeout:  10s
+      retries:  3
+
+  # ── Frontend (React + Nginx) ──────────────────────────────────────────────────
+  frontend:
+    build:
+      context:    ./meet-hasammie-suah_frontend
+      dockerfile: Dockerfile
+    container_name: sammie_frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "3000:80"
+
+  # ── Nginx reverse proxy (production) ─────────────────────────────────────────
+  # Uncomment this entire block when deploying to your Hostinger VPS.
+  # Make sure you've run Certbot first (see nginx/production.conf for steps).
+  # proxy:
+  #   image: nginx:alpine
+  #   container_name: sammie_proxy
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - api
+  #     - frontend
+  #   volumes:
+  #     - ./nginx/production.conf:/etc/nginx/conf.d/default.conf:ro
+  #     - /etc/letsencrypt:/etc/letsencrypt:ro   # SSL certs from Certbot
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+
+volumes:
+  postgres_data:    # database persists between restarts
+  uploads_data:     # uploaded images persist between restarts

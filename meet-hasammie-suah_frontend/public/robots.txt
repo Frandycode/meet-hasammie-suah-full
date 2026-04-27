@@ -1,0 +1,14 @@
+# robots.txt — tells search engines what they can and can't index
+# Learn more: https://developers.google.com/search/docs/crawling-indexing/robots/intro
+
+User-agent: *
+
+# Allow everything on the public site
+Allow: /
+
+# Block admin pages from being indexed — these are private
+Disallow: /admin/
+Disallow: /admin
+
+# Where to find the sitemap
+Sitemap: https://meethasammiesuah.com/sitemap.xml

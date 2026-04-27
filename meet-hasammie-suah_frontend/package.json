@@ -1,0 +1,47 @@
+{
+  "name": "meet-hasammie-suah",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Personal athlete website for HaSammie Suah \u2014 Top 5 Track Runner in the State of Oklahoma. Built with Vite, React, TypeScript, and Tailwind CSS. Features a public-facing profile site and a hidden admin dashboard for full content management.",
+  "author": {
+    "name": "Frandy Slueue",
+    "github": "https://github.com/frandycode",
+    "url": "https://frandycode.dev"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@apollo/client": "^4.1.6",
+    "graphql": "^16.13.1",
+    "lucide-react": "^0.577.0",
+    "posthog-js": "^1.240.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-easy-crop": "^5.5.6",
+    "react-icons": "^5.6.0",
+    "react-router-dom": "^7.13.1",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@types/node": "^24.12.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.0",
+    "autoprefixer": "^10.4.27",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.4.0",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^3.4.19",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.56.1",
+    "vite": "^8.0.0"
+  }
+}
